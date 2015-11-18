@@ -12,8 +12,11 @@ from copy import deepcopy
 from lxml import etree
 from glob import glob
 
-SVG = "http://www.w3.org/2000/svg"
-XLINK = "http://www.w3.org/1999/xlink"
+NS = {
+    'svg': "http://www.w3.org/2000/svg",
+    'xlink': "http://www.w3.org/1999/xlink",
+    'inkscape': "http://www.inkscape.org/namespaces/inkscape",
+}
 
 def make_parser():
      
@@ -70,21 +73,22 @@ def make_imgs_svg(opt):
     parent_map = {c:p for p in dom.iter() for c in p}
     svg_file = os.path.join(opt.dirname, opt.basename, "%s.svg" % opt.basename)
     opt.svg_file = svg_file
-    layer = dom.find(".//{%s}g[@id='layer_0']" % SVG)
-    img_count = len(glob(os.path.join(opt.dirname, opt.basename, "%s-*.png" % opt.basename)))
-    for n in range(img_count):
+    #layer = dom.xpath(".//svg:g[@id='layer_0']", namespaces=NS)[0]
+    #img_count = len(glob(os.path.join(opt.dirname, opt.basename, "%s-*.png" % opt.basename)))
+    for n in range(3):
+        break
         if n == 0:
             new_layer = layer
         else:
             new_layer = deepcopy(layer)
             parent_map[layer].append(new_layer)
         new_layer.set('id', 'layer_%04d' % (n+1))
-        img = new_layer.find(".//{%s}image" % SVG)
-        img.set('id', 'img_%04d' % (n+1))
-        img.set('{%s}href' % XLINK, 'file://./%s-%d.png' % (opt.basename, n))
+        new_layer.set('{%s}label' % NS['inkscape'], 'Page %04d' % (n+1))
+        # img = new_layer.xpath(".//svg:image", namespaces=NS)[0]
+        # img.set('id', 'img_%04d' % (n+1))
+        # img.set('{%s}href' % NS['xlink'], 'file://./%s-%d.png' % (opt.basename, n))
     dom.write(svg_file)
     
-
 def main():
     opt = make_parser().parse_args()
     

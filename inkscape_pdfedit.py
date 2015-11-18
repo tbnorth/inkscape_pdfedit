@@ -14,7 +14,7 @@ from glob import glob
 
 SVG = "http://www.w3.org/2000/svg"
 XLINK = "http://www.w3.org/1999/xlink"
-
+INKSCAPE = "http://www.inkscape.org/namespaces/inkscape"
 def make_parser():
      
      parser = argparse.ArgumentParser(
@@ -61,7 +61,7 @@ def make_imgs_svg(opt):
         os.path.join(opt.dirname, opt.basename, "%s-*.png" % opt.basename))
     print(cmd)
     # os.system(cmd)
-    
+
     svg_template = os.path.join(
         os.path.dirname(__file__),
         'inkscape_pdf_template.svg'
@@ -79,9 +79,11 @@ def make_imgs_svg(opt):
             new_layer = deepcopy(layer)
             parent_map[layer].append(new_layer)
         new_layer.set('id', 'layer_%04d' % (n+1))
+        new_layer.set('{%s}label' % INKSCAPE, 'Page %04d' % (n+1))
         img = new_layer.find(".//{%s}image" % SVG)
         img.set('id', 'img_%04d' % (n+1))
-        img.set('{%s}href' % XLINK, 'file://./%s-%d.png' % (opt.basename, n))
+        fileref = 'file://%s-%d.png' % (os.path.join(os.path.abspath(opt.dirname), opt.basename, opt.basename), n)
+        img.set('{%s}href' % XLINK, fileref)
     dom.write(svg_file)
     
 

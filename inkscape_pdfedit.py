@@ -55,7 +55,7 @@ def make_imgs_svg(opt):
     if not os.path.exists(os.path.join(opt.dirname, opt.basename)):
         os.mkdir(os.path.join(opt.dirname, opt.basename))
     cmd = "convert -density 300 %s %s" % (
-        opt.filename, os.path.join(opt.dirname, opt.basename, "%s.png" % opt.basename))
+        opt.filename, os.path.join(opt.dirname, opt.basename, "%s-%%04d.png" % opt.basename))
     print(cmd)
     os.system(cmd)
     cmd = "mogrify -flatten %s" % (
@@ -83,7 +83,7 @@ def make_imgs_svg(opt):
         new_layer.set('{%s}label' % INKSCAPE, 'Page %04d' % (n+1))
         img = new_layer.find(".//{%s}image" % SVG)
         img.set('id', 'img_%04d' % (n+1))
-        fileref = 'file://%s-%d.png' % (os.path.join(os.path.abspath(opt.dirname), opt.basename, opt.basename), n)
+        fileref = 'file://%s-%04d.png' % (os.path.join(os.path.abspath(opt.dirname), opt.basename, opt.basename), n)
         img.set('{%s}href' % XLINK, fileref)
         img.set('{%s}insensitive' % SODIPODI, "true")
     dom.write(svg_file)

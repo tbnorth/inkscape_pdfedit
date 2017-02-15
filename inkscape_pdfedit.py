@@ -24,9 +24,9 @@ def make_parser():
          formatter_class=argparse.ArgumentDefaultsHelpFormatter
      )
      
-     # parser.add_argument("--foo", action='store_true',
-     #     help="help"
-     # )
+     parser.add_argument("--changed-only", action='store_true',
+         help="Only output pages with changes, skipping instruction only pages etc."
+     )
      parser.add_argument('filename', type=str, help="PDF filename")
 
      return parser
@@ -100,26 +100,32 @@ def make_pdf(opt):
     # set all layers visible
     svg_file = os.path.join(opt.dirname, opt.basename, "%s.svg" % opt.basename)
     dom = ElementTree.parse(open(svg_file))
+    changed = []
     for n in range(img_count):
         layer = dom.find(".//{%s}g[@id='layer_%04d']" % (SVG, (n+1)))
         layer.set('style', '')
+        changed.append(len(layer) > 1)
     dom.write(svg_file)
 
+    basepath = os.path.join(opt.basename, opt.basename)
+
     for n in range(img_count):
-        cmd = ("inkscape --without-gui --file=%s.svg --export-pdf=%s_%04d.pdf "
-               "--export-id=%s --export-id-only" % (
-            os.path.join(opt.basename, opt.basename),
-            os.path.join(opt.basename, opt.basename), n,
-            'layer_%04d' % (n+1)))
+        if opt.changed_only and not changed[n]:
+            cmd = "rm -f %s_%04d.pdf" % (basepath, n)
+        else:
+            cmd = ("inkscape --without-gui --file=%s.svg --export-pdf=%s_%04d.pdf "
+                   "--export-id=%s --export-id-only" % (
+                basepath,
+                basepath, n,
+                'layer_%04d' % (n+1)))
         print(cmd)
         os.system(cmd)
 
     cmd = ("gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dSAFER "
-        "-sOutputFile=%s_edit.pdf %s" % (
-        os.path.join(opt.basename, opt.basename),
-        ' '.join("%s_%04d.pdf" % (os.path.join(opt.basename, opt.basename), n)
-                 for n in range(img_count)
-        )))
+        "-sOutputFile=%s_edit.pdf %s_????.pdf" % (
+        basepath,
+        basepath
+    ))
     print(cmd)
     os.system(cmd)
 

@@ -2,7 +2,7 @@
 inkscape_pdfedit.py - export a pdf to multiple images, load as
 layers in Inkscape.
 
-Terry Brown, Terry_N_Brown@yahoo.com, Tue Nov 17 16:39:28 2015
+Terry Brown, TerryNBrown@gmail.com, Tue Nov 17 16:39:28 2015
 """
 
 import argparse
@@ -17,20 +17,20 @@ XLINK = "http://www.w3.org/1999/xlink"
 INKSCAPE = "http://www.inkscape.org/namespaces/inkscape"
 SODIPODI = "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
 def make_parser():
-     
+
      parser = argparse.ArgumentParser(
          description="inkscape_pdfedit.py - export a pdf to multiple images, "
                      "load as layers in Inkscape",
          formatter_class=argparse.ArgumentDefaultsHelpFormatter
      )
-     
+
      parser.add_argument("--changed-only", action='store_true',
          help="Only output pages with changes, skipping instruction only pages etc."
      )
      parser.add_argument('filename', type=str, help="PDF filename")
 
      return parser
- 
+
 def proc_file(opt):
     """proc_file - do next step in process
 
@@ -87,7 +87,6 @@ def make_imgs_svg(opt):
         img.set('{%s}href' % XLINK, fileref)
         img.set('{%s}insensitive' % SODIPODI, "true")
     dom.write(svg_file)
-    
 
 def make_pdf(opt):
     """make_pdf - save layers and make pdf
@@ -131,7 +130,7 @@ def make_pdf(opt):
 
 def main():
     opt = make_parser().parse_args()
-    
+
     proc_file(opt)
 
 if __name__ == '__main__':
